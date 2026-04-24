@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -87,19 +88,17 @@ function evaluarEstado(promedio){
     }
 }
 
-
 function validarNotas(n1, n2, n3){
     return (n1 >= 0 && n1 <= 10) &&
            (n2 >= 0 && n2 <= 10) &&
            (n3 >= 0 && n3 <= 10);
 }
 
-
 function actualizarTabla(){
     const tbody = document.querySelector("#userTable tbody");
     tbody.innerHTML = "";
 
-    usuarios.forEach((u, index) => {
+    usuarios.forEach((u) => {
         let fila = tbody.insertRow();
 
         fila.insertCell(0).innerText = u.nombre;
@@ -110,16 +109,11 @@ function actualizarTabla(){
         let estadoCell = fila.insertCell(4);
         estadoCell.innerText = u.estado;
 
-       
         if(u.estado === "Aprobado") estadoCell.className = "aprobado";
-        if(u.estado === "Supletorio") estadoCell.className = "supletorio";
-        if(u.estado === "Pierde") estadoCell.className = "pierde";
-
-        fila.insertCell(5).appendChild(btn);
+        else if(u.estado === "Supletorio") estadoCell.className = "supletorio";
+        else estadoCell.className = "pierde";
     });
 }
-
-
 
 document.getElementById("form").addEventListener("submit", function(e){
     e.preventDefault();
@@ -140,7 +134,7 @@ document.getElementById("form").addEventListener("submit", function(e){
     let promedio = calcularPromedio(n1, n2, n3);
     let estado = evaluarEstado(promedio);
 
-    let nuevo = {
+    let nuevoUsuario = {
         nombre,
         correo,
         edad,
@@ -148,12 +142,13 @@ document.getElementById("form").addEventListener("submit", function(e){
         estado
     };
 
-    usuarios.push(nuevo);
+    usuarios.push(nuevoUsuario);
 
     localStorage.setItem("usuarios", JSON.stringify(usuarios));
 
-    document.getElementById("form").reset();
     actualizarTabla();
+
+    document.getElementById("form").reset();
 });
 
 actualizarTabla();
