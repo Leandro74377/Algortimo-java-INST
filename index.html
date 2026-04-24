@@ -51,7 +51,7 @@
             <input type="number" class="form-control" id="note3" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Guardar</button>
+        <button type="submit" class="btn btn-primary">Enviar</button>
     </form>
 
     <h2 class="mt-5">Usuarios Registrados</h2>
@@ -64,7 +64,6 @@
                 <th>Edad</th>
                 <th>Promedio</th>
                 <th>Estado</th>
-                <th>Acción</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -116,22 +115,10 @@ function actualizarTabla(){
         if(u.estado === "Supletorio") estadoCell.className = "supletorio";
         if(u.estado === "Pierde") estadoCell.className = "pierde";
 
-     
-        let btn = document.createElement("button");
-        btn.className = "btn btn-danger btn-sm";
-        btn.innerText = "Eliminar";
-        btn.onclick = () => eliminarUsuario(index);
-
         fila.insertCell(5).appendChild(btn);
     });
 }
 
-
-function eliminarUsuario(index){
-    usuarios.splice(index, 1);
-    localStorage.setItem("usuarios", JSON.stringify(usuarios));
-    actualizarTabla();
-}
 
 
 document.getElementById("form").addEventListener("submit", function(e){
