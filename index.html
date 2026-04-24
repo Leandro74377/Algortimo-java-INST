@@ -1,65 +1,176 @@
-<!DOCTYPE html> <!-- promedio notas -->
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario y Tabla</title>
-    <!-- Agregar Bootstrap -->
+
+    <!-- Bootstrap -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .aprobado { color: green; font-weight: bold; }
+        .supletorio { color: orange; font-weight: bold; }
+        .pierde { color: red; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Formulario de Registro</h2>
-        <form id="form">
-            <div class="form-group">
-                <label for="name">Nombre:</label>
-                <input type="text" class="form-control" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Correo electrónico:</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
-            <div class="form-group">
-                <label for="age">Edad:</label>
-                <input type="number" class="form-control" id="age" name="age" required>
-            </div>
 
-            <h3>Notas:</h3>
-            <div class="form-group">
-                <label for="note1">Nota 1:</label>
-                <input type="number" class="form-control" id="note1" name="note1" required>
-            </div>
-            <div class="form-group">
-                <label for="note2">Nota 2:</label>
-                <input type="number" class="form-control" id="note2" name="note2" required>
-            </div>
-            <div class="form-group">
-                <label for="note3">Nota 3:</label>
-                <input type="number" class="form-control" id="note3" name="note3" required>
-            </div>
+<div class="container mt-5">
+    <h2>Formulario de Registro</h2>
 
-            <button type="submit" class="btn btn-primary">Enviar</button>
-        </form>
+    <form id="form">
+        <div class="form-group">
+            <label>Nombre:</label>
+            <input type="text" class="form-control" id="name" required>
+        </div>
 
-        <h2 class="mt-5">Usuarios Registrados</h2>
-        <table id="userTable" class="table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Edad</th>
-                    <th>Promedio</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+        <div class="form-group">
+            <label>Correo:</label>
+            <input type="email" class="form-control" id="email" required>
+        </div>
 
-    <script>
-           </script>
+        <div class="form-group">
+            <label>Edad:</label>
+            <input type="number" class="form-control" id="age" required>
+        </div>
 
-    <!-- Agregar Bootstrap JS y jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        <h4>Notas</h4>
+
+        <div class="form-group">
+            <label>Nota 1:</label>
+            <input type="number" class="form-control" id="note1" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nota 2:</label>
+            <input type="number" class="form-control" id="note2" required>
+        </div>
+
+        <div class="form-group">
+            <label>Nota 3:</label>
+            <input type="number" class="form-control" id="note3" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+
+    <h2 class="mt-5">Usuarios Registrados</h2>
+
+    <table class="table table-bordered" id="userTable">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Edad</th>
+                <th>Promedio</th>
+                <th>Estado</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+let usuarios = JSON.parse(localStorage.getItem("usuarios")) || [];
+
+function calcularPromedio(n1, n2, n3){
+    return (n1 + n2 + n3) / 3;
+}
+
+function evaluarEstado(promedio){
+    if(promedio >= 7){
+        return "Aprobado";
+    } else if(promedio >= 6){
+        return "Supletorio";
+    } else {
+        return "Pierde";
+    }
+}
+
+
+function validarNotas(n1, n2, n3){
+    return (n1 >= 0 && n1 <= 10) &&
+           (n2 >= 0 && n2 <= 10) &&
+           (n3 >= 0 && n3 <= 10);
+}
+
+
+function actualizarTabla(){
+    const tbody = document.querySelector("#userTable tbody");
+    tbody.innerHTML = "";
+
+    usuarios.forEach((u, index) => {
+        let fila = tbody.insertRow();
+
+        fila.insertCell(0).innerText = u.nombre;
+        fila.insertCell(1).innerText = u.correo;
+        fila.insertCell(2).innerText = u.edad;
+        fila.insertCell(3).innerText = u.promedio.toFixed(2);
+
+        let estadoCell = fila.insertCell(4);
+        estadoCell.innerText = u.estado;
+
+       
+        if(u.estado === "Aprobado") estadoCell.className = "aprobado";
+        if(u.estado === "Supletorio") estadoCell.className = "supletorio";
+        if(u.estado === "Pierde") estadoCell.className = "pierde";
+
+     
+        let btn = document.createElement("button");
+        btn.className = "btn btn-danger btn-sm";
+        btn.innerText = "Eliminar";
+        btn.onclick = () => eliminarUsuario(index);
+
+        fila.insertCell(5).appendChild(btn);
+    });
+}
+
+
+function eliminarUsuario(index){
+    usuarios.splice(index, 1);
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+    actualizarTabla();
+}
+
+
+document.getElementById("form").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    let nombre = document.getElementById("name").value;
+    let correo = document.getElementById("email").value;
+    let edad = document.getElementById("age").value;
+
+    let n1 = parseFloat(document.getElementById("note1").value);
+    let n2 = parseFloat(document.getElementById("note2").value);
+    let n3 = parseFloat(document.getElementById("note3").value);
+
+    if(!validarNotas(n1, n2, n3)){
+        alert("Las notas deben estar entre 0 y 10");
+        return;
+    }
+
+    let promedio = calcularPromedio(n1, n2, n3);
+    let estado = evaluarEstado(promedio);
+
+    let nuevo = {
+        nombre,
+        correo,
+        edad,
+        promedio,
+        estado
+    };
+
+    usuarios.push(nuevo);
+
+    localStorage.setItem("usuarios", JSON.stringify(usuarios));
+
+    document.getElementById("form").reset();
+    actualizarTabla();
+});
+
+actualizarTabla();
+</script>
+
 </body>
 </html>
